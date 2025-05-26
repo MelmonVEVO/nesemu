@@ -3,20 +3,12 @@
 #ifndef TYPES_H
 #define TYPES_H
 
-#define FLAG_NEGATIVE 128
-#define FLAG_OVERFLOW 64
-#define FLAG_BREAK 16
-#define FLAG_DECIMAL 8
-#define FLAG_INTERRUPT_DISABLE 4
-#define FLAG_ZERO 2
-#define FLAG_CARRY 1
-
 typedef uint8_t u8;
 typedef uint16_t u16;
 typedef int8_t s8;
 typedef int16_t s16;
 
-typedef enum {
+typedef enum : u8 {
   // ADC - Add with Carry
   ADC_IMM = 0x69,  // ADC #$nn
   ADC_ZP = 0x65,   // ADC $nn
@@ -282,13 +274,24 @@ typedef enum {
 
 } Opcode;
 
+typedef enum : u8 {
+  FLAG_NEGATIVE = 0x80,
+  FLAG_OVERFLOW = 0x40,
+  FLAG_BREAK = 0x10,
+  FLAG_DECIMAL = 0x08,
+  FLAG_INTERRUPT_DISABLE = 0x04,
+  FLAG_ZERO = 0x02,
+  FLAG_CARRY = 0x01
+} Flag;
+
 typedef struct {
   u8 A;   // Accumulator
   u8 X;   // Index register X
   u8 Y;   // Index register Y
   u8 S;   // Stack pointer
   u16 PC; // Program counter
-  u16 P;  // Status registers
+  u8 P;   // Status registers
+  u8 mem[0x10000];
 } CPU;
 
 #endif // TYPES_H

@@ -12,6 +12,7 @@ DEP := $(OBJ:.o=.d)
 CFLAGS := -I$(INC_DIR) -Wall -Wextra -MMD -MP
 LDFLAGS :=
 
+UNITY_SRC_DIR := ./unity/src
 TEST_DIR := ./test
 TEST_BUILD_DIR := $(BUILD_DIR)/test
 TEST_TARGET := $(TEST_BUILD_DIR)/test_runner

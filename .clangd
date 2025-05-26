@@ -1,2 +1,2 @@
 CompileFlags:
-  Add: [-I/home/melmon/Documents/programming/c/nesemu/include]
+  Add: [-I/home/melmon/Documents/programming/c/nesemu/unity/src, -I/home/melmon/Documents/programming/c/nesemu/include]
