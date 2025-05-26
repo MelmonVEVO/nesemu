@@ -55,6 +55,21 @@ const InstructionFunc INSTRUCTION_TABLE[256] = {
     [PLP_IMP] = &plp,
 };
 
+void execute(CPU *cpu) {
+  u8 opcode = read_byte(cpu, cpu->PC);
+  if (1) {
+  }
+}
+
+void run_loop(CPU *cpu) {
+  while (1) {
+    execute(cpu);
+    if (get_flag(cpu, FLAG_BREAK)) {
+      break;
+    }
+  }
+}
+
 int main(int argc, char *argv[]) {
   if (argc < 2) {
     fprintf(stderr, "file not provided.");

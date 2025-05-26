@@ -16,7 +16,6 @@ u8 get_flag(CPU *cpu, Flag flag);
 void nop(CPU *cpu);
 
 // LDA instructions
-void lda_common(CPU *cpu, u8 value);
 void lda_immediate(CPU *cpu);
 void lda_zeropage(CPU *cpu);
 void lda_zeropage_x(CPU *cpu);
@@ -27,7 +26,6 @@ void lda_indirect_x(CPU *cpu);
 void lda_indirect_y(CPU *cpu);
 
 // LDX instructions
-void ldx_common(CPU *cpu, u8 value);
 void ldx_immediate(CPU *cpu);
 void ldx_zeropage(CPU *cpu);
 void ldx_zeropage_y(CPU *cpu);
@@ -35,7 +33,6 @@ void ldx_absolute(CPU *cpu);
 void ldx_absolute_y(CPU *cpu);
 
 // LDY instructions
-void ldy_common(CPU *cpu, u8 value);
 void ldy_immediate(CPU *cpu);
 void ldy_zeropage(CPU *cpu);
 void ldy_zeropage_x(CPU *cpu);
@@ -86,7 +83,6 @@ void pla(CPU *cpu);
 void plp(CPU *cpu);
 
 // Logic operations
-void and_common(CPU *cpu, u8 value);
 void and_immediate(CPU *cpu);
 void and_zeropage(CPU *cpu);
 void and_zeropage_x(CPU *cpu);
@@ -96,7 +92,6 @@ void and_absolute_y(CPU *cpu);
 void and_indirect_x(CPU *cpu);
 void and_indirect_y(CPU *cpu);
 
-void ora_common(CPU *cpu, u8 value);
 void ora_immediate(CPU *cpu);
 void ora_zeropage(CPU *cpu);
 void ora_zeropage_x(CPU *cpu);
@@ -106,7 +101,6 @@ void ora_absolute_y(CPU *cpu);
 void ora_indirect_x(CPU *cpu);
 void ora_indirect_y(CPU *cpu);
 
-void eor_common(CPU *cpu, u8 value);
 void eor_immediate(CPU *cpu);
 void eor_zeropage(CPU *cpu);
 void eor_zeropage_x(CPU *cpu);
@@ -116,7 +110,6 @@ void eor_absolute_y(CPU *cpu);
 void eor_indirect_x(CPU *cpu);
 void eor_indirect_y(CPU *cpu);
 
-void cmp_common(CPU *cpu, u8 value);
 void cmp_immediate(CPU *cpu);
 void cmp_zeropage(CPU *cpu);
 void cmp_zeropage_x(CPU *cpu);

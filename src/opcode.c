@@ -56,25 +56,25 @@ void absolute_offset_write(CPU *cpu, u8 offset, u8 val) {
   write_byte(cpu, addr, val);
 }
 
-u8 indexed_indirect_read(CPU *cpu) {
+u8 indexed_indirect_read_x(CPU *cpu) {
   u8 id_addr = read_byte(cpu, cpu->PC + 1) + cpu->X;
   u16 addr = absolute_addr_at(cpu, id_addr);
   return read_byte(cpu, addr);
 }
 
-void indexed_indirect_write(CPU *cpu, u8 val) {
+void indexed_indirect_write_x(CPU *cpu, u8 val) {
   u8 id_addr = read_byte(cpu, cpu->PC + 1) + cpu->X;
   u16 addr = absolute_addr_at(cpu, id_addr);
   write_byte(cpu, addr, val);
 }
 
-u8 indirect_indexed_read(CPU *cpu) {
+u8 indirect_indexed_read_y(CPU *cpu) {
   u8 id_addr = read_byte(cpu, cpu->PC + 1);
   u16 addr = absolute_addr_at(cpu, id_addr) + cpu->Y;
   return read_byte(cpu, addr);
 }
 
-void indirect_indexed_write(CPU *cpu, u8 val) {
+void indirect_indexed_write_y(CPU *cpu, u8 val) {
   u8 id_addr = read_byte(cpu, cpu->PC + 1);
   u16 addr = absolute_addr_at(cpu, id_addr) + cpu->Y;
   write_byte(cpu, addr, val);
@@ -92,7 +92,7 @@ u8 get_flag(CPU *cpu, Flag flag) { return cpu->P & flag; }
 
 void nop(CPU *cpu) {} // NOP
 
-void lda_common(CPU *cpu, u8 value) {
+static void lda_common(CPU *cpu, u8 value) {
   cpu->A = value;
   set_flag(cpu, FLAG_NEGATIVE, value & 0x80);
   set_flag(cpu, FLAG_ZERO, value == 0);
@@ -115,13 +115,13 @@ void lda_absolute_y(CPU *cpu) {
   lda_common(cpu, absolute_offset_read(cpu, cpu->Y));
 } // LDA $nnnn,Y
 void lda_indirect_x(CPU *cpu) {
-  lda_common(cpu, indexed_indirect_read(cpu));
+  lda_common(cpu, indexed_indirect_read_x(cpu));
 } // LDA ($nn,X)
 void lda_indirect_y(CPU *cpu) {
-  lda_common(cpu, indirect_indexed_read(cpu));
+  lda_common(cpu, indirect_indexed_read_y(cpu));
 } // LDA ($nn),Y
 
-void ldx_common(CPU *cpu, u8 value) {
+static void ldx_common(CPU *cpu, u8 value) {
   cpu->X = value;
   set_flag(cpu, FLAG_NEGATIVE, value & 0x80);
   set_flag(cpu, FLAG_ZERO, value == 0);
@@ -141,7 +141,7 @@ void ldx_absolute_y(CPU *cpu) {
   ldx_common(cpu, absolute_offset_read(cpu, cpu->Y));
 } // LDX $nnnn,Y
 
-void ldy_common(CPU *cpu, u8 value) {
+static void ldy_common(CPU *cpu, u8 value) {
   cpu->Y = value;
   set_flag(cpu, FLAG_NEGATIVE, value & 0x80);
   set_flag(cpu, FLAG_ZERO, value == 0);
@@ -173,10 +173,10 @@ void sta_absolute_y(CPU *cpu) {
   absolute_offset_write(cpu, cpu->Y, cpu->A);
 } // STA $nnnn,Y
 void sta_indirect_x(CPU *cpu) {
-  indexed_indirect_write(cpu, cpu->A);
+  indexed_indirect_write_x(cpu, cpu->A);
 } // STA ($nn,X)
 void sta_indirect_y(CPU *cpu) {
-  indirect_indexed_write(cpu, cpu->A);
+  indirect_indexed_write_y(cpu, cpu->A);
 } // STA ($nn),Y
 
 void stx_zeropage(CPU *cpu) { zeropage_write(cpu, cpu->X); } // STX $nn
@@ -271,7 +271,7 @@ void php(CPU *cpu) { push_stack(cpu, cpu->P); } // PHP
 void pla(CPU *cpu) { pop_stack(cpu, &cpu->A); } // PLA
 void plp(CPU *cpu) { pop_stack(cpu, &cpu->P); } // PLP
 
-void and_common(CPU *cpu, u8 value) {
+static void and_common(CPU *cpu, u8 value) {
   cpu->A &= value;
   set_flag(cpu, FLAG_NEGATIVE, cpu->A & 0x80);
   set_flag(cpu, FLAG_ZERO, cpu->A == 0);
@@ -293,13 +293,13 @@ void and_absolute_y(CPU *cpu) {
   and_common(cpu, absolute_offset_read(cpu, cpu->Y));
 } // AND $nnnn,Y
 void and_indirect_x(CPU *cpu) {
-  and_common(cpu, indexed_indirect_read(cpu));
+  and_common(cpu, indexed_indirect_read_x(cpu));
 } // AND ($nn,X)
 void and_indirect_y(CPU *cpu) {
-  and_common(cpu, indirect_indexed_read(cpu));
+  and_common(cpu, indirect_indexed_read_y(cpu));
 } // AND ($nn),Y
 
-void ora_common(CPU *cpu, u8 value) {
+static void ora_common(CPU *cpu, u8 value) {
   cpu->A |= value;
   set_flag(cpu, FLAG_NEGATIVE, cpu->A & 0x80);
   set_flag(cpu, FLAG_ZERO, cpu->A == 0);
@@ -321,13 +321,13 @@ void ora_absolute_y(CPU *cpu) {
   ora_common(cpu, absolute_offset_read(cpu, cpu->Y));
 } // ORA $nnnn,Y
 void ora_indirect_x(CPU *cpu) {
-  ora_common(cpu, indexed_indirect_read(cpu));
+  ora_common(cpu, indexed_indirect_read_x(cpu));
 } // ORA ($nn,X)
 void ora_indirect_y(CPU *cpu) {
-  ora_common(cpu, indirect_indexed_read(cpu));
+  ora_common(cpu, indirect_indexed_read_y(cpu));
 } // ORA ($nn),Y
 
-void eor_common(CPU *cpu, u8 value) {
+static void eor_common(CPU *cpu, u8 value) {
   cpu->A ^= value;
   set_flag(cpu, FLAG_NEGATIVE, cpu->A & 0x80);
   set_flag(cpu, FLAG_ZERO, cpu->A == 0);
@@ -349,17 +349,17 @@ void eor_absolute_y(CPU *cpu) {
   eor_common(cpu, absolute_offset_read(cpu, cpu->Y));
 } // EOR $nnnn,Y
 void eor_indirect_x(CPU *cpu) {
-  eor_common(cpu, indexed_indirect_read(cpu));
+  eor_common(cpu, indexed_indirect_read_x(cpu));
 } // EOR ($nn,X)
 void eor_indirect_y(CPU *cpu) {
-  eor_common(cpu, indirect_indexed_read(cpu));
+  eor_common(cpu, indirect_indexed_read_y(cpu));
 } // EOR ($nn),Y
 
-void bit_common(CPU *cpu, u8 value) {
+static void bit_common(CPU *cpu, u8 value) {
   u8 result = cpu->A & value;
   set_flag(cpu, FLAG_ZERO, !result);
-  set_flag(cpu, FLAG_OVERFLOW, result & 0x40);
-  set_flag(cpu, FLAG_NEGATIVE, result & 0x80);
+  set_flag(cpu, FLAG_OVERFLOW, value & 0x40);
+  set_flag(cpu, FLAG_NEGATIVE, value & 0x80);
 }
 void bit_zeropage(CPU *cpu) {
   u8 value = zeropage_read(cpu);
@@ -369,6 +369,57 @@ void bit_absolute(CPU *cpu) {
   u8 value = absolute_read(cpu);
   bit_common(cpu, value);
 } // BIT $nnnn
+
+static void adc_common(CPU *cpu, u8 add) {
+  u16 result = (u16)cpu->A + (u16)add + (u16)(cpu->P & FLAG_CARRY);
+  set_flag(cpu, FLAG_CARRY, result > 0x00FF);
+  set_flag(cpu, FLAG_ZERO, !result);
+  set_flag(cpu, FLAG_OVERFLOW, (result ^ cpu->A) & (result ^ add) & 0x0080);
+  set_flag(cpu, FLAG_NEGATIVE, result & 0x0080);
+  cpu->A = (u8)result;
+}
+void adc_immediate(CPU *cpu) {
+  u8 mem = read_byte(cpu, cpu->PC + 1);
+  adc_common(cpu, mem);
+} // ADC #$nn
+void adc_zeropage(CPU *cpu) {
+  u8 mem = zeropage_read(cpu);
+  adc_common(cpu, mem);
+} // ADC $nn
+void adc_zeropage_x(CPU *cpu) {
+  u8 mem = zeropage_offset_read(cpu, cpu->X);
+  adc_common(cpu, mem);
+} // ADC $nn,X
+void adc_absolute(CPU *cpu) {
+  u8 mem = absolute_read(cpu);
+  adc_common(cpu, mem);
+} // ADC $nnnn
+void adc_absolute_x(CPU *cpu) {
+  u8 mem = absolute_offset_read(cpu, cpu->X);
+  adc_common(cpu, mem);
+} // ADC $nnnn,X
+void adc_absolute_y(CPU *cpu) {
+  u8 mem = absolute_offset_read(cpu, cpu->Y);
+  adc_common(cpu, mem);
+} // ADC $nnnn,Y
+void adc_indirect_x(CPU *cpu) {
+  u8 mem = indexed_indirect_read_x(cpu);
+  adc_common(cpu, mem);
+} // ADC ($nn,X)
+void adc_indirect_y(CPU *cpu) {
+  u8 mem = indirect_indexed_read_y(cpu);
+  adc_common(cpu, mem);
+} // ADC ($nn),Y
+
+static void sbc_common(CPU *cpu, u8 sub) {}
+void sbc_immediate(CPU *cpu);
+void sbc_zeropage(CPU *cpu);
+void sbc_zeropage_x(CPU *cpu);
+void sbc_absolute(CPU *cpu);
+void sbc_absolute_x(CPU *cpu);
+void sbc_absolute_y(CPU *cpu);
+void sbc_indirect_x(CPU *cpu);
+void sbc_indirect_y(CPU *cpu);
 
 void brk(CPU *cpu) {
   push_stack(cpu, cpu->PC + 2);
