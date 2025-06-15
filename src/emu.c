@@ -72,14 +72,14 @@ void run_loop(CPU *cpu) {
 
 int main(int argc, char *argv[]) {
   if (argc < 2) {
-    fprintf(stderr, "file not provided.");
+    fprintf(stderr, "file not provided.\n");
     return 1;
   }
 
   char *filename = argv[1];
   FILE *file = fopen(filename, "rb");
   if (file == NULL) {
-    fprintf(stderr, "error opening file. the file may not exist.");
+    fprintf(stderr, "error opening file. the file may not exist.\n");
     return 1;
   }
 
@@ -87,6 +87,7 @@ int main(int argc, char *argv[]) {
   long file_size = ftell(file);
   fseek(file, 0, SEEK_SET);
 
+  printf("the file is %ld big\n", file_size);
   CPU cpu = {0};
 
   return 0;
