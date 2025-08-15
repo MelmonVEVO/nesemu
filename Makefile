@@ -91,3 +91,4 @@ test: $(TEST_RESULTS)
 	fi
 	@echo "======================== ALL OK ========================"
 
+.PRECIOUS: $(BUILD_DIR)/%_test

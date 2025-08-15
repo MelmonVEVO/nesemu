@@ -1,0 +1,71 @@
+This was copied and pasted from a website that I forgot, it's not a fixed plan but it'll keep me on track.
+
+
+1. Start from CPU first. And make sure it’s really solid. Permalink
+
+Duh. You can’t do anything without CPU. Just go implement the instructions and the main loop - stick to the official instructions first. There are very few games use unofficial/undocumented instructions.
+2. Add NES rom support (and mapper 0) Permalink
+
+Why add ROM support before you can actually render anything to screen? You want to use test roms to make sure your CPU simulation is really good and squash bugs as early as possible. This will save you a ton of time.
+
+Trust me - you don’t want to find your CPU bugs in real games. And you’ll als catch your own regressions. Many ROMs would automatically write a success/fail code at a well known location - this can be your check/asserts, depending on what test framework you use.
+
+And eventually you’d want to load some games, right? :)
+
+If you find that some test ROM need unofficial instructions, add them as needed.
+3. Then go implement your PPU. Permalink
+
+This is probably going to be fairly involved if not challenging. Even for experienced programmers, the PPU rendering pipeline takes quite a bit of time to wrap one’s head around. Due to memory constraints, the rendering tiles/sprites is completely 8x8 tile (block) based, and the way those tiles are represented in memory takes a bit getting used too (bitplanes, etc), and implementing the precise rendering pipeline has a lot of details.
+
+Don’t worry about rendering to screen yet. Just observe your VRAM and see with your inner eye to imagine.
+
+Don’t add scroll. That should be the next step.
+
+Now you can add the rendering and the main game loop. Make sure your game loop process as the exact cycle as the real hardware by doing some math over elapsed tick count and CPU MHZ.
+4. Go try some simple games Permalink
+
+Try some games that don’t scroll and use mapper 0. Donkey Kong/Popeye/balloon fight are solid choices. You want to focus on those simple ones before you attempt your favorite games.
+5. Add scrolling Permalink
+
+Scrolling is tricky because you need to locate the exact pixel within 8x8 tile, and you’ll also render one more tile if the X scroll isn’t a factor of 8. Go read the scrolling doc and make sure all the interaction between PPU register, PPUADDR and scrolling parameters are done exactly right.
+6. Test a scrolling game Permalink
+
+Ice Climber is a great choice for Y scroll. Horizontal scrolling games are trickier and should be tested in step 7.
+7. Try out Super Mario Bros. Permalink
+
+Once quite a few simple mapper 0 game work great, now it’s time to take your emulator to a real test. Super Mario Bros isn’t particularly tricky, but is quite demanding that your emulator should have a fairly complete CPU and PPU emulation with reasonable accuracy.
+8. Add APU support Permalink
+
+I haven’t finished this one personally. Will update once I got it working. To get this to work you need to understand square waves, triangle waves, etc. Audio programming was black magic to me but I’m starting to get it.
+9. Add more mappers (MMC1, MMC3, etc) Permalink
+
+More mappers = more games. In general the first few mappers are great candidates as it is supported by most games.
+10. Try a real tricky game to emulate Permalink
+
+Battletoads, if you are up for a challenge. Or there are more to choose from.
+11. Add fancy features Permalink
+
+At this point, you should have many games working. Now you can decide what matter most to your emulator - there are a lot of things you can do now:
+
+    Add a debugger support
+    Add load/save state
+    Add reverse/forward
+    Add cheating support
+    Add more games and fix games
+    Add more test roms
+    …
+
+
+When things go wrong Permalink
+
+This is when things get really interesting (and frustrating).
+
+There are a few strategies that I found really helpful:
+
+    Use logs - your emulator should support writing diagnostic logs - including CPU instructions getting executed, what cycle is it at, scanline start/end, whether there is an interrupt, etc. In many cases comparing logs with your emulator and some other emulator would immediately identify the problem with CPU bugs, timing issues, freezes.
+
+    Compare with a excellent NES emulator with great debugger support. Mesen’s excellent debugger makes debugging much easier. Debugging the code and observe what it does, compare the cycles, looking at memory, and tile/sprites data in PPU. This is extremely helpful.
+
+    If you have time, build your own debugger for your emulator. If you can directly see the contents of your sprites/background tiles represented in your own debugger window, you can easily see whether the problem is happening - is it a rendering bug (the data is correct), or the data simply isn’t there (most likely timing issue, CPU bug, or mappper bug).
+
+All in all,dDebugging is pretty painful, so avoid it if you can. This means having really good tests using the test roms and automate them. So that you can know if you made a regression after every build.

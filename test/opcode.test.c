@@ -19,16 +19,16 @@ void tearDown(void) {
   // Clean up if needed
 }
 
-static void test_lda_instructions(void) {
-  // Test LDA Immediate
+static void test_lda_immediate(void) {
   cpu.mem[0] = LDA_IMM;
   cpu.mem[1] = 0x42;
   lda_immediate(&cpu);
   TEST_ASSERT_EQUAL_HEX8(0x42, cpu.A);
   TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_ZERO));
   TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_NEGATIVE));
+}
 
-  // Test LDA Zero Page
+static void test_lda_zeropage(void) {
   cpu.mem[0] = LDA_ZP;
   cpu.mem[1] = 0x20;
   cpu.mem[0x20] = 0x55;
@@ -36,8 +36,9 @@ static void test_lda_instructions(void) {
   TEST_ASSERT_EQUAL_HEX8(0x55, cpu.A);
   TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_ZERO));
   TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_NEGATIVE));
+}
 
-  // Test LDA Zero Page X
+static void test_lda_zeropage_x(void) {
   cpu.mem[0] = LDA_ZPX;
   cpu.mem[1] = 0x20;
   cpu.X = 0x05;
@@ -46,8 +47,9 @@ static void test_lda_instructions(void) {
   TEST_ASSERT_EQUAL_HEX8(0x66, cpu.A);
   TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_ZERO));
   TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_NEGATIVE));
+}
 
-  // Test LDA Absolute
+static void test_lda_absolute(void) {
   cpu.mem[0] = LDA_ABS;
   cpu.mem[1] = 0x34;
   cpu.mem[2] = 0x12;
@@ -56,62 +58,68 @@ static void test_lda_instructions(void) {
   TEST_ASSERT_EQUAL_HEX8(0x77, cpu.A);
   TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_ZERO));
   TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_NEGATIVE));
+}
 
-  // Test LDA Absolute X
+static void test_lda_absolute_x(void) {
   cpu.mem[0] = LDA_ABSX;
   cpu.mem[1] = 0x34;
   cpu.mem[2] = 0x12;
   cpu.X = 0x02;
-  cpu.mem[0x1236] = 0x88;
+  cpu.mem[0x1236] = 0x08;
   lda_absolute_x(&cpu);
-  TEST_ASSERT_EQUAL_HEX8(0x88, cpu.A);
+  TEST_ASSERT_EQUAL_HEX8(0x08, cpu.A);
   TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_ZERO));
   TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_NEGATIVE));
+}
 
-  // Test LDA Absolute Y
+static void test_lda_absolute_y(void) {
   cpu.mem[0] = LDA_ABSY;
   cpu.mem[1] = 0x34;
   cpu.mem[2] = 0x12;
   cpu.Y = 0x03;
-  cpu.mem[0x1237] = 0x99;
+  cpu.mem[0x1237] = 0x19;
   lda_absolute_y(&cpu);
-  TEST_ASSERT_EQUAL_HEX8(0x99, cpu.A);
+  TEST_ASSERT_EQUAL_HEX8(0x19, cpu.A);
   TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_ZERO));
   TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_NEGATIVE));
+}
 
-  // Test LDA Indirect X
+static void test_lda_indirect_x(void) {
   cpu.mem[0] = LDA_INDX;
   cpu.mem[1] = 0x20;
   cpu.X = 0x05;
   cpu.mem[0x25] = 0x34;
   cpu.mem[0x26] = 0x12;
-  cpu.mem[0x1234] = 0xAA;
+  cpu.mem[0x1234] = 0x2A;
   lda_indirect_x(&cpu);
-  TEST_ASSERT_EQUAL_HEX8(0xAA, cpu.A);
+  TEST_ASSERT_EQUAL_HEX8(0x2A, cpu.A);
   TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_ZERO));
   TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_NEGATIVE));
+}
 
-  // Test LDA Indirect Y
+static void test_lda_indirect_y(void) {
   cpu.mem[0] = LDA_INDY;
   cpu.mem[1] = 0x20;
   cpu.Y = 0x05;
   cpu.mem[0x20] = 0x34;
   cpu.mem[0x21] = 0x12;
-  cpu.mem[0x1239] = 0xBB;
+  cpu.mem[0x1239] = 0x3B;
   lda_indirect_y(&cpu);
-  TEST_ASSERT_EQUAL_HEX8(0xBB, cpu.A);
+  TEST_ASSERT_EQUAL_HEX8(0x3B, cpu.A);
   TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_ZERO));
   TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_NEGATIVE));
+}
 
-  // Test LDA Zero Flag
+static void test_lda_zero_flag(void) {
   cpu.mem[0] = LDA_IMM;
   cpu.mem[1] = 0x00;
   lda_immediate(&cpu);
   TEST_ASSERT_EQUAL_HEX8(0x00, cpu.A);
   TEST_ASSERT_TRUE(get_flag(&cpu, FLAG_ZERO));
   TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_NEGATIVE));
+}
 
-  // Test LDA Negative Flag
+static void test_lda_negative_flag(void) {
   cpu.mem[0] = LDA_IMM;
   cpu.mem[1] = 0x80;
   lda_immediate(&cpu);
@@ -120,166 +128,179 @@ static void test_lda_instructions(void) {
   TEST_ASSERT_TRUE(get_flag(&cpu, FLAG_NEGATIVE));
 }
 
-static void test_ldx_instructions(void) {
-  TEST_IGNORE();
-  // Test LDX Immediate
+static void test_ldx_immediate(void) {
   cpu.mem[0] = LDX_IMM;
   cpu.mem[1] = 0x42;
   ldx_immediate(&cpu);
   TEST_ASSERT_EQUAL_HEX8(0x42, cpu.X);
-  TEST_ASSERT_EQUAL_HEX8(0, get_flag(&cpu, FLAG_ZERO));
-  TEST_ASSERT_EQUAL_HEX8(0, get_flag(&cpu, FLAG_NEGATIVE));
+  TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_ZERO));
+  TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_NEGATIVE));
+}
 
-  // Test LDX Zero Page
+static void test_ldx_zeropage(void) {
   cpu.mem[0] = LDX_ZP;
   cpu.mem[1] = 0x20;
   cpu.mem[0x20] = 0x55;
   ldx_zeropage(&cpu);
   TEST_ASSERT_EQUAL_HEX8(0x55, cpu.X);
-  TEST_ASSERT_EQUAL_HEX8(0, get_flag(&cpu, FLAG_ZERO));
-  TEST_ASSERT_EQUAL_HEX8(0, get_flag(&cpu, FLAG_NEGATIVE));
+  TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_ZERO));
+  TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_NEGATIVE));
+}
 
-  // Test LDX Zero Page Y
+static void test_ldx_zeropage_y(void) {
   cpu.mem[0] = LDX_ZPY;
   cpu.mem[1] = 0x20;
   cpu.Y = 0x05;
   cpu.mem[0x25] = 0x66;
   ldx_zeropage_y(&cpu);
   TEST_ASSERT_EQUAL_HEX8(0x66, cpu.X);
-  TEST_ASSERT_EQUAL_HEX8(0, get_flag(&cpu, FLAG_ZERO));
-  TEST_ASSERT_EQUAL_HEX8(0, get_flag(&cpu, FLAG_NEGATIVE));
+  TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_ZERO));
+  TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_NEGATIVE));
+}
 
-  // Test LDX Absolute
+static void test_ldx_absolute(void) {
   cpu.mem[0] = LDX_ABS;
   cpu.mem[1] = 0x34;
   cpu.mem[2] = 0x12;
   cpu.mem[0x1234] = 0x77;
   ldx_absolute(&cpu);
   TEST_ASSERT_EQUAL_HEX8(0x77, cpu.X);
-  TEST_ASSERT_EQUAL_HEX8(0, get_flag(&cpu, FLAG_ZERO));
-  TEST_ASSERT_EQUAL_HEX8(0, get_flag(&cpu, FLAG_NEGATIVE));
+  TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_ZERO));
+  TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_NEGATIVE));
+}
 
-  // Test LDX Absolute Y
+static void test_ldx_absolute_y(void) {
   cpu.mem[0] = LDX_ABSY;
   cpu.mem[1] = 0x34;
   cpu.mem[2] = 0x12;
   cpu.Y = 0x02;
-  cpu.mem[0x1236] = 0x88;
+  cpu.mem[0x1236] = 0x08;
   ldx_absolute_y(&cpu);
-  TEST_ASSERT_EQUAL_HEX8(0x88, cpu.X);
-  TEST_ASSERT_EQUAL_HEX8(0, get_flag(&cpu, FLAG_ZERO));
-  TEST_ASSERT_EQUAL_HEX8(0, get_flag(&cpu, FLAG_NEGATIVE));
+  TEST_ASSERT_EQUAL_HEX8(0x08, cpu.X);
+  TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_ZERO));
+  TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_NEGATIVE));
+}
 
-  // Test LDX Zero Flag
+static void test_ldx_zero_flag(void) {
   cpu.mem[0] = LDX_IMM;
   cpu.mem[1] = 0x00;
   ldx_immediate(&cpu);
   TEST_ASSERT_EQUAL_HEX8(0x00, cpu.X);
-  TEST_ASSERT_EQUAL_HEX8(FLAG_ZERO, get_flag(&cpu, FLAG_ZERO));
-  TEST_ASSERT_EQUAL_HEX8(0, get_flag(&cpu, FLAG_NEGATIVE));
+  TEST_ASSERT_TRUE(get_flag(&cpu, FLAG_ZERO));
+  TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_NEGATIVE));
+}
 
-  // Test LDX Negative Flag
+static void test_ldx_negative_flag(void) {
   cpu.mem[0] = LDX_IMM;
   cpu.mem[1] = 0x80;
   ldx_immediate(&cpu);
   TEST_ASSERT_EQUAL_HEX8(0x80, cpu.X);
-  TEST_ASSERT_EQUAL_HEX8(0, get_flag(&cpu, FLAG_ZERO));
-  TEST_ASSERT_EQUAL_HEX8(FLAG_NEGATIVE, get_flag(&cpu, FLAG_NEGATIVE));
+  TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_ZERO));
+  TEST_ASSERT_TRUE(get_flag(&cpu, FLAG_NEGATIVE));
 }
 
-static void test_ldy_instructions(void) {
-  TEST_IGNORE();
-  // Test LDY Immediate
+static void test_ldy_immediate(void) {
   cpu.mem[0] = LDY_IMM;
   cpu.mem[1] = 0x42;
   ldy_immediate(&cpu);
   TEST_ASSERT_EQUAL_HEX8(0x42, cpu.Y);
-  TEST_ASSERT_EQUAL_HEX8(0, get_flag(&cpu, FLAG_ZERO));
-  TEST_ASSERT_EQUAL_HEX8(0, get_flag(&cpu, FLAG_NEGATIVE));
+  TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_ZERO));
+  TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_NEGATIVE));
+}
 
-  // Test LDY Zero Page
+static void test_ldy_zeropage(void) {
   cpu.mem[0] = LDY_ZP;
   cpu.mem[1] = 0x20;
   cpu.mem[0x20] = 0x55;
   ldy_zeropage(&cpu);
   TEST_ASSERT_EQUAL_HEX8(0x55, cpu.Y);
-  TEST_ASSERT_EQUAL_HEX8(0, get_flag(&cpu, FLAG_ZERO));
-  TEST_ASSERT_EQUAL_HEX8(0, get_flag(&cpu, FLAG_NEGATIVE));
+  TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_ZERO));
+  TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_NEGATIVE));
+}
 
-  // Test LDY Zero Page X
+static void test_ldy_zeropage_x(void) {
   cpu.mem[0] = LDY_ZPX;
   cpu.mem[1] = 0x20;
   cpu.X = 0x05;
   cpu.mem[0x25] = 0x66;
   ldy_zeropage_x(&cpu);
   TEST_ASSERT_EQUAL_HEX8(0x66, cpu.Y);
-  TEST_ASSERT_EQUAL_HEX8(0, get_flag(&cpu, FLAG_ZERO));
-  TEST_ASSERT_EQUAL_HEX8(0, get_flag(&cpu, FLAG_NEGATIVE));
+  TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_ZERO));
+  TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_NEGATIVE));
+}
 
-  // Test LDY Absolute
+static void test_ldy_absolute(void) {
   cpu.mem[0] = LDY_ABS;
   cpu.mem[1] = 0x34;
   cpu.mem[2] = 0x12;
   cpu.mem[0x1234] = 0x77;
   ldy_absolute(&cpu);
   TEST_ASSERT_EQUAL_HEX8(0x77, cpu.Y);
-  TEST_ASSERT_EQUAL_HEX8(0, get_flag(&cpu, FLAG_ZERO));
-  TEST_ASSERT_EQUAL_HEX8(0, get_flag(&cpu, FLAG_NEGATIVE));
+  TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_ZERO));
+  TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_NEGATIVE));
+}
 
-  // Test LDY Absolute X
+static void test_ldy_absolute_x(void) {
   cpu.mem[0] = LDY_ABSX;
   cpu.mem[1] = 0x34;
   cpu.mem[2] = 0x12;
   cpu.X = 0x02;
-  cpu.mem[0x1236] = 0x88;
+  cpu.mem[0x1236] = 0x08;
   ldy_absolute_x(&cpu);
-  TEST_ASSERT_EQUAL_HEX8(0x88, cpu.Y);
-  TEST_ASSERT_EQUAL_HEX8(0, get_flag(&cpu, FLAG_ZERO));
-  TEST_ASSERT_EQUAL_HEX8(0, get_flag(&cpu, FLAG_NEGATIVE));
+  TEST_ASSERT_EQUAL_HEX8(0x08, cpu.Y);
+  TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_ZERO));
+  TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_NEGATIVE));
+}
 
-  // Test LDY Zero Flag
+static void test_ldy_zero_flag(void) {
   cpu.mem[0] = LDY_IMM;
   cpu.mem[1] = 0x00;
   ldy_immediate(&cpu);
   TEST_ASSERT_EQUAL_HEX8(0x00, cpu.Y);
-  TEST_ASSERT_EQUAL_HEX8(FLAG_ZERO, get_flag(&cpu, FLAG_ZERO));
-  TEST_ASSERT_EQUAL_HEX8(0, get_flag(&cpu, FLAG_NEGATIVE));
+  TEST_ASSERT_TRUE(get_flag(&cpu, FLAG_ZERO));
+  TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_NEGATIVE));
+}
 
-  // Test LDY Negative Flag
+static void test_ldy_negative_flag(void) {
   cpu.mem[0] = LDY_IMM;
   cpu.mem[1] = 0x80;
   ldy_immediate(&cpu);
   TEST_ASSERT_EQUAL_HEX8(0x80, cpu.Y);
-  TEST_ASSERT_EQUAL_HEX8(0, get_flag(&cpu, FLAG_ZERO));
-  TEST_ASSERT_EQUAL_HEX8(FLAG_NEGATIVE, get_flag(&cpu, FLAG_NEGATIVE));
+  TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_ZERO));
+  TEST_ASSERT_TRUE(get_flag(&cpu, FLAG_NEGATIVE));
 }
 
-static void test_sta_instructions(void) {
+static void test_sta_zeropage(void) {
   TEST_IGNORE();
-  // Test STA Zero Page
   cpu.A = 0x42;
   cpu.mem[0] = STA_ZP;
   cpu.mem[1] = 0x20;
   sta_zeropage(&cpu);
   TEST_ASSERT_EQUAL_HEX8(0x42, cpu.mem[0x20]);
+}
 
-  // Test STA Zero Page X
+static void test_sta_zeropage_x(void) {
+  TEST_IGNORE();
   cpu.A = 0x55;
   cpu.X = 0x05;
   cpu.mem[0] = STA_ZPX;
   cpu.mem[1] = 0x20;
   sta_zeropage_x(&cpu);
   TEST_ASSERT_EQUAL_HEX8(0x55, cpu.mem[0x25]);
+}
 
-  // Test STA Absolute
+static void test_sta_absolute(void) {
+  TEST_IGNORE();
   cpu.A = 0x66;
   cpu.mem[0] = STA_ABS;
   cpu.mem[1] = 0x34;
   cpu.mem[2] = 0x12;
   sta_absolute(&cpu);
   TEST_ASSERT_EQUAL_HEX8(0x66, cpu.mem[0x1234]);
+}
 
-  // Test STA Absolute X
+static void test_sta_absolute_x(void) {
+  TEST_IGNORE();
   cpu.A = 0x77;
   cpu.X = 0x02;
   cpu.mem[0] = STA_ABSX;
@@ -287,8 +308,10 @@ static void test_sta_instructions(void) {
   cpu.mem[2] = 0x12;
   sta_absolute_x(&cpu);
   TEST_ASSERT_EQUAL_HEX8(0x77, cpu.mem[0x1236]);
+}
 
-  // Test STA Absolute Y
+static void test_sta_absolute_y(void) {
+  TEST_IGNORE();
   cpu.A = 0x88;
   cpu.Y = 0x03;
   cpu.mem[0] = STA_ABSY;
@@ -296,8 +319,10 @@ static void test_sta_instructions(void) {
   cpu.mem[2] = 0x12;
   sta_absolute_y(&cpu);
   TEST_ASSERT_EQUAL_HEX8(0x88, cpu.mem[0x1237]);
+}
 
-  // Test STA Indirect X
+static void test_sta_indirect_x(void) {
+  TEST_IGNORE();
   cpu.A = 0x99;
   cpu.X = 0x05;
   cpu.mem[0] = STA_INDX;
@@ -306,8 +331,10 @@ static void test_sta_instructions(void) {
   cpu.mem[0x26] = 0x12;
   sta_indirect_x(&cpu);
   TEST_ASSERT_EQUAL_HEX8(0x99, cpu.mem[0x1234]);
+}
 
-  // Test STA Indirect Y
+static void test_sta_indirect_y(void) {
+  TEST_IGNORE();
   cpu.A = 0xAA;
   cpu.Y = 0x05;
   cpu.mem[0] = STA_INDY;
@@ -316,197 +343,215 @@ static void test_sta_instructions(void) {
   cpu.mem[0x21] = 0x12;
   sta_indirect_y(&cpu);
   TEST_ASSERT_EQUAL_HEX8(0xAA, cpu.mem[0x1239]);
+}
 
-  // Test that STA doesn't affect flags
+static void test_sta_flags_unchanged_zero(void) {
+  TEST_IGNORE();
   u8 original_flags = cpu.P;
-  cpu.A = 0x00; // Zero value
+  cpu.A = 0x00;
   cpu.mem[0] = STA_ZP;
   cpu.mem[1] = 0x30;
   sta_zeropage(&cpu);
   TEST_ASSERT_EQUAL_HEX8(0x00, cpu.mem[0x30]);
-  TEST_ASSERT_EQUAL_HEX8(original_flags, cpu.P); // Flags unchanged
+  TEST_ASSERT_EQUAL_HEX8(original_flags, cpu.P);
+}
 
-  cpu.A = 0x80; // Negative value
+static void test_sta_flags_unchanged_negative(void) {
+  TEST_IGNORE();
+  u8 original_flags = cpu.P;
+  cpu.A = 0x80;
   cpu.mem[0] = STA_ZP;
   cpu.mem[1] = 0x31;
   sta_zeropage(&cpu);
   TEST_ASSERT_EQUAL_HEX8(0x80, cpu.mem[0x31]);
-  TEST_ASSERT_EQUAL_HEX8(original_flags, cpu.P); // Flags unchanged
+  TEST_ASSERT_EQUAL_HEX8(original_flags, cpu.P);
 }
 
-static void test_stx_instructions(void) {
+static void test_stx_zeropage(void) {
   TEST_IGNORE();
-  // Test STX Zero Page
   cpu.X = 0x42;
   cpu.mem[0] = STX_ZP;
   cpu.mem[1] = 0x20;
   stx_zeropage(&cpu);
   TEST_ASSERT_EQUAL_HEX8(0x42, cpu.mem[0x20]);
+}
 
-  // Test STX Zero Page Y
+static void test_stx_zeropage_y(void) {
+  TEST_IGNORE();
   cpu.X = 0x55;
   cpu.Y = 0x05;
   cpu.mem[0] = STX_ZPY;
   cpu.mem[1] = 0x20;
   stx_zeropage_y(&cpu);
   TEST_ASSERT_EQUAL_HEX8(0x55, cpu.mem[0x25]);
+}
 
-  // Test STX Absolute
+static void test_stx_absolute(void) {
+  TEST_IGNORE();
   cpu.X = 0x66;
   cpu.mem[0] = STX_ABS;
   cpu.mem[1] = 0x34;
   cpu.mem[2] = 0x12;
   stx_absolute(&cpu);
   TEST_ASSERT_EQUAL_HEX8(0x66, cpu.mem[0x1234]);
+}
 
-  // Test that STX doesn't affect flags
+static void test_stx_flags_unchanged_zero(void) {
+  TEST_IGNORE();
   u8 original_flags = cpu.P;
   cpu.X = 0x00; // Zero value
   cpu.mem[0] = STX_ZP;
   cpu.mem[1] = 0x30;
   stx_zeropage(&cpu);
   TEST_ASSERT_EQUAL_HEX8(0x00, cpu.mem[0x30]);
-  TEST_ASSERT_EQUAL_HEX8(original_flags, cpu.P); // Flags unchanged
+  TEST_ASSERT_EQUAL_HEX8(original_flags, cpu.P);
+}
 
+static void test_stx_flags_unchanged_negative(void) {
+  TEST_IGNORE();
+  u8 original_flags = cpu.P;
   cpu.X = 0x80; // Negative value
   cpu.mem[0] = STX_ZP;
   cpu.mem[1] = 0x31;
   stx_zeropage(&cpu);
   TEST_ASSERT_EQUAL_HEX8(0x80, cpu.mem[0x31]);
-  TEST_ASSERT_EQUAL_HEX8(original_flags, cpu.P); // Flags unchanged
+  TEST_ASSERT_EQUAL_HEX8(original_flags, cpu.P);
 }
 
-static void test_sty_instructions(void) {
+static void test_sty_zeropage(void) {
   TEST_IGNORE();
-  // Test STY Zero Page
   cpu.Y = 0x42;
   cpu.mem[0] = STY_ZP;
   cpu.mem[1] = 0x20;
   sty_zeropage(&cpu);
   TEST_ASSERT_EQUAL_HEX8(0x42, cpu.mem[0x20]);
+}
 
-  // Test STY Zero Page X
+static void test_sty_zeropage_x(void) {
+  TEST_IGNORE();
   cpu.Y = 0x55;
   cpu.X = 0x05;
   cpu.mem[0] = STY_ZPX;
   cpu.mem[1] = 0x20;
   sty_zeropage_x(&cpu);
   TEST_ASSERT_EQUAL_HEX8(0x55, cpu.mem[0x25]);
+}
 
-  // Test STY Absolute
+static void test_sty_absolute(void) {
+  TEST_IGNORE();
   cpu.Y = 0x66;
   cpu.mem[0] = STY_ABS;
   cpu.mem[1] = 0x34;
   cpu.mem[2] = 0x12;
   sty_absolute(&cpu);
   TEST_ASSERT_EQUAL_HEX8(0x66, cpu.mem[0x1234]);
+}
 
-  // Test that STY doesn't affect flags
+static void test_sty_flags_unchanged_zero(void) {
+  TEST_IGNORE();
   u8 original_flags = cpu.P;
   cpu.Y = 0x00; // Zero value
   cpu.mem[0] = STY_ZP;
   cpu.mem[1] = 0x30;
   sty_zeropage(&cpu);
   TEST_ASSERT_EQUAL_HEX8(0x00, cpu.mem[0x30]);
-  TEST_ASSERT_EQUAL_HEX8(original_flags, cpu.P); // Flags unchanged
+  TEST_ASSERT_EQUAL_HEX8(original_flags, cpu.P);
+}
 
+static void test_sty_flags_unchanged_negative(void) {
+  TEST_IGNORE();
+  u8 original_flags = cpu.P;
   cpu.Y = 0x80; // Negative value
   cpu.mem[0] = STY_ZP;
   cpu.mem[1] = 0x31;
   sty_zeropage(&cpu);
   TEST_ASSERT_EQUAL_HEX8(0x80, cpu.mem[0x31]);
-  TEST_ASSERT_EQUAL_HEX8(original_flags, cpu.P); // Flags unchanged
+  TEST_ASSERT_EQUAL_HEX8(original_flags, cpu.P);
 }
 
-static void test_transfer_instructions(void) {
+static void test_tax_basic(void) {
   TEST_IGNORE();
-  // Test TAX - Transfer Accumulator to X
-  cpu.A = 0x42;
-  cpu.X = 0x00; // Clear X to verify transfer
-  tax(&cpu);
+  cpu.A = 0x42; cpu.X = 0x00; tax(&cpu);
   TEST_ASSERT_EQUAL_HEX8(0x42, cpu.X);
-  TEST_ASSERT_EQUAL_HEX8(0, get_flag(&cpu, FLAG_ZERO));
-  TEST_ASSERT_EQUAL_HEX8(0, get_flag(&cpu, FLAG_NEGATIVE));
-
-  // Test TAX with zero value
-  cpu.A = 0x00;
-  tax(&cpu);
+  TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_ZERO));
+  TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_NEGATIVE));
+}
+static void test_tax_zero_flag(void) {
+  TEST_IGNORE();
+  cpu.A = 0x00; tax(&cpu);
   TEST_ASSERT_EQUAL_HEX8(0x00, cpu.X);
-  TEST_ASSERT_EQUAL_HEX8(FLAG_ZERO, get_flag(&cpu, FLAG_ZERO));
-  TEST_ASSERT_EQUAL_HEX8(0, get_flag(&cpu, FLAG_NEGATIVE));
-
-  // Test TAX with negative value
-  cpu.A = 0x80;
-  tax(&cpu);
+  TEST_ASSERT_TRUE(get_flag(&cpu, FLAG_ZERO));
+  TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_NEGATIVE));
+}
+static void test_tax_negative_flag(void) {
+  TEST_IGNORE();
+  cpu.A = 0x80; tax(&cpu);
   TEST_ASSERT_EQUAL_HEX8(0x80, cpu.X);
-  TEST_ASSERT_EQUAL_HEX8(0, get_flag(&cpu, FLAG_ZERO));
-  TEST_ASSERT_EQUAL_HEX8(FLAG_NEGATIVE, get_flag(&cpu, FLAG_NEGATIVE));
-
-  // Test TAY - Transfer Accumulator to Y
-  cpu.A = 0x55;
-  cpu.Y = 0x00; // Clear Y to verify transfer
-  tay(&cpu);
+  TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_ZERO));
+  TEST_ASSERT_TRUE(get_flag(&cpu, FLAG_NEGATIVE));
+}
+static void test_tay_basic(void) {
+  TEST_IGNORE();
+  cpu.A = 0x55; cpu.Y = 0x00; tay(&cpu);
   TEST_ASSERT_EQUAL_HEX8(0x55, cpu.Y);
-  TEST_ASSERT_EQUAL_HEX8(0, get_flag(&cpu, FLAG_ZERO));
-  TEST_ASSERT_EQUAL_HEX8(0, get_flag(&cpu, FLAG_NEGATIVE));
-
-  // Test TAY with zero value
-  cpu.A = 0x00;
-  tay(&cpu);
+  TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_ZERO));
+  TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_NEGATIVE));
+}
+static void test_tay_zero_flag(void) {
+  TEST_IGNORE();
+  cpu.A = 0x00; tay(&cpu);
   TEST_ASSERT_EQUAL_HEX8(0x00, cpu.Y);
-  TEST_ASSERT_EQUAL_HEX8(FLAG_ZERO, get_flag(&cpu, FLAG_ZERO));
-  TEST_ASSERT_EQUAL_HEX8(0, get_flag(&cpu, FLAG_NEGATIVE));
-
-  // Test TAY with negative value
-  cpu.A = 0xFF;
-  tay(&cpu);
+  TEST_ASSERT_TRUE(get_flag(&cpu, FLAG_ZERO));
+  TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_NEGATIVE));
+}
+static void test_tay_negative_flag(void) {
+  TEST_IGNORE();
+  cpu.A = 0xFF; tay(&cpu);
   TEST_ASSERT_EQUAL_HEX8(0xFF, cpu.Y);
-  TEST_ASSERT_EQUAL_HEX8(0, get_flag(&cpu, FLAG_ZERO));
-  TEST_ASSERT_EQUAL_HEX8(FLAG_NEGATIVE, get_flag(&cpu, FLAG_NEGATIVE));
-
-  // Test TXA - Transfer X to Accumulator
-  cpu.X = 0x33;
-  cpu.A = 0x00; // Clear A to verify transfer
-  txa(&cpu);
+  TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_ZERO));
+  TEST_ASSERT_TRUE(get_flag(&cpu, FLAG_NEGATIVE));
+}
+static void test_txa_basic(void) {
+  TEST_IGNORE();
+  cpu.X = 0x33; cpu.A = 0x00; txa(&cpu);
   TEST_ASSERT_EQUAL_HEX8(0x33, cpu.A);
-  TEST_ASSERT_EQUAL_HEX8(0, get_flag(&cpu, FLAG_ZERO));
-  TEST_ASSERT_EQUAL_HEX8(0, get_flag(&cpu, FLAG_NEGATIVE));
-
-  // Test TXA with zero value
-  cpu.X = 0x00;
-  txa(&cpu);
+  TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_ZERO));
+  TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_NEGATIVE));
+}
+static void test_txa_zero_flag(void) {
+  TEST_IGNORE();
+  cpu.X = 0x00; txa(&cpu);
   TEST_ASSERT_EQUAL_HEX8(0x00, cpu.A);
-  TEST_ASSERT_EQUAL_HEX8(FLAG_ZERO, get_flag(&cpu, FLAG_ZERO));
-  TEST_ASSERT_EQUAL_HEX8(0, get_flag(&cpu, FLAG_NEGATIVE));
-
-  // Test TXA with negative value
-  cpu.X = 0x90;
-  txa(&cpu);
+  TEST_ASSERT_TRUE(get_flag(&cpu, FLAG_ZERO));
+  TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_NEGATIVE));
+}
+static void test_txa_negative_flag(void) {
+  TEST_IGNORE();
+  cpu.X = 0x90; txa(&cpu);
   TEST_ASSERT_EQUAL_HEX8(0x90, cpu.A);
-  TEST_ASSERT_EQUAL_HEX8(0, get_flag(&cpu, FLAG_ZERO));
-  TEST_ASSERT_EQUAL_HEX8(FLAG_NEGATIVE, get_flag(&cpu, FLAG_NEGATIVE));
-
-  // Test TYA - Transfer Y to Accumulator
-  cpu.Y = 0x77;
-  cpu.A = 0x00; // Clear A to verify transfer
-  tya(&cpu);
+  TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_ZERO));
+  TEST_ASSERT_TRUE(get_flag(&cpu, FLAG_NEGATIVE));
+}
+static void test_tya_basic(void) {
+  TEST_IGNORE();
+  cpu.Y = 0x77; cpu.A = 0x00; tya(&cpu);
   TEST_ASSERT_EQUAL_HEX8(0x77, cpu.A);
-  TEST_ASSERT_EQUAL_HEX8(0, get_flag(&cpu, FLAG_ZERO));
-  TEST_ASSERT_EQUAL_HEX8(0, get_flag(&cpu, FLAG_NEGATIVE));
-
-  // Test TYA with zero value
-  cpu.Y = 0x00;
-  tya(&cpu);
+  TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_ZERO));
+  TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_NEGATIVE));
+}
+static void test_tya_zero_flag(void) {
+  TEST_IGNORE();
+  cpu.Y = 0x00; tya(&cpu);
   TEST_ASSERT_EQUAL_HEX8(0x00, cpu.A);
-  TEST_ASSERT_EQUAL_HEX8(FLAG_ZERO, get_flag(&cpu, FLAG_ZERO));
-  TEST_ASSERT_EQUAL_HEX8(0, get_flag(&cpu, FLAG_NEGATIVE));
-
-  // Test TYA with negative value
-  cpu.Y = 0xA0;
-  tya(&cpu);
+  TEST_ASSERT_TRUE(get_flag(&cpu, FLAG_ZERO));
+  TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_NEGATIVE));
+}
+static void test_tya_negative_flag(void) {
+  TEST_IGNORE();
+  cpu.Y = 0xA0; tya(&cpu);
   TEST_ASSERT_EQUAL_HEX8(0xA0, cpu.A);
-  TEST_ASSERT_EQUAL_HEX8(0, get_flag(&cpu, FLAG_ZERO));
-  TEST_ASSERT_EQUAL_HEX8(FLAG_NEGATIVE, get_flag(&cpu, FLAG_NEGATIVE));
+  TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_ZERO));
+  TEST_ASSERT_TRUE(get_flag(&cpu, FLAG_NEGATIVE));
 }
 
 static void test_branch_instructions(void) {
@@ -755,6 +800,176 @@ static void test_stack_instructions(void) {
   TEST_ASSERT_EQUAL_HEX8(original_flags, cpu.P); // Flags should be unchanged
 }
 
+// --- Modularized Branch Tests ---
+static void test_bcc_branches(void) {
+  TEST_IGNORE();
+  cpu.PC = 0x1000; set_flag(&cpu, FLAG_CARRY, 0);
+  cpu.mem[0x1000] = BCC_REL; cpu.mem[0x1001] = 0x10; bcc(&cpu); cpu.PC += 2;
+  TEST_ASSERT_EQUAL_HEX16(0x1012, cpu.PC);
+}
+static void test_bcc_no_branch(void) {
+  TEST_IGNORE();
+  cpu.PC = 0x1000; set_flag(&cpu, FLAG_CARRY, 1);
+  cpu.mem[0x1000] = BCC_REL; cpu.mem[0x1001] = 0x10; bcc(&cpu); cpu.PC += 2;
+  TEST_ASSERT_EQUAL_HEX16(0x1002, cpu.PC);
+}
+static void test_bcs_branches(void) {
+  TEST_IGNORE();
+  cpu.PC = 0x1000; set_flag(&cpu, FLAG_CARRY, 1);
+  cpu.mem[0x1000] = BCS_REL; cpu.mem[0x1001] = 0x08; bcs(&cpu); cpu.PC += 2;
+  TEST_ASSERT_EQUAL_HEX16(0x100A, cpu.PC);
+}
+static void test_bcs_no_branch(void) {
+  TEST_IGNORE();
+  cpu.PC = 0x1000; set_flag(&cpu, FLAG_CARRY, 0);
+  cpu.mem[0x1000] = BCS_REL; cpu.mem[0x1001] = 0x08; bcs(&cpu); cpu.PC += 2;
+  TEST_ASSERT_EQUAL_HEX16(0x1002, cpu.PC);
+}
+static void test_beq_branches(void) {
+  TEST_IGNORE();
+  cpu.PC = 0x1000; set_flag(&cpu, FLAG_ZERO, 1);
+  cpu.mem[0x1000] = BEQ_REL; cpu.mem[0x1001] = 0x0A; beq(&cpu); cpu.PC += 2;
+  TEST_ASSERT_EQUAL_HEX16(0x100C, cpu.PC);
+}
+static void test_beq_no_branch(void) {
+  TEST_IGNORE();
+  cpu.PC = 0x1000; set_flag(&cpu, FLAG_ZERO, 0);
+  cpu.mem[0x1000] = BEQ_REL; cpu.mem[0x1001] = 0x0A; beq(&cpu); cpu.PC += 2;
+  TEST_ASSERT_EQUAL_HEX16(0x1002, cpu.PC);
+}
+static void test_bmi_branches(void) {
+  TEST_IGNORE();
+  cpu.PC = 0x1000; set_flag(&cpu, FLAG_NEGATIVE, 1);
+  cpu.mem[0x1000] = BMI_REL; cpu.mem[0x1001] = 0x04; bmi(&cpu); cpu.PC += 2;
+  TEST_ASSERT_EQUAL_HEX16(0x1006, cpu.PC);
+}
+static void test_bmi_no_branch(void) {
+  TEST_IGNORE();
+  cpu.PC = 0x1000; set_flag(&cpu, FLAG_NEGATIVE, 0);
+  cpu.mem[0x1000] = BMI_REL; cpu.mem[0x1001] = 0x04; bmi(&cpu); cpu.PC += 2;
+  TEST_ASSERT_EQUAL_HEX16(0x1002, cpu.PC);
+}
+static void test_bne_branches(void) {
+  TEST_IGNORE();
+  cpu.PC = 0x1000; set_flag(&cpu, FLAG_ZERO, 0);
+  cpu.mem[0x1000] = BNE_REL; cpu.mem[0x1001] = 0x0C; bne(&cpu); cpu.PC += 2;
+  TEST_ASSERT_EQUAL_HEX16(0x100E, cpu.PC);
+}
+static void test_bne_no_branch(void) {
+  TEST_IGNORE();
+  cpu.PC = 0x1000; set_flag(&cpu, FLAG_ZERO, 1);
+  cpu.mem[0x1000] = BNE_REL; cpu.mem[0x1001] = 0x0C; bne(&cpu); cpu.PC += 2;
+  TEST_ASSERT_EQUAL_HEX16(0x1002, cpu.PC);
+}
+static void test_bpl_branches(void) {
+  TEST_IGNORE();
+  cpu.PC = 0x1000; set_flag(&cpu, FLAG_NEGATIVE, 0);
+  cpu.mem[0x1000] = BPL_REL; cpu.mem[0x1001] = 0x0A; bpl(&cpu); cpu.PC += 2;
+  TEST_ASSERT_EQUAL_HEX16(0x100C, cpu.PC);
+}
+static void test_bpl_no_branch(void) {
+  TEST_IGNORE();
+  cpu.PC = 0x1000; set_flag(&cpu, FLAG_NEGATIVE, 1);
+  cpu.mem[0x1000] = BPL_REL; cpu.mem[0x1001] = 0x0A; bpl(&cpu); cpu.PC += 2;
+  TEST_ASSERT_EQUAL_HEX16(0x1002, cpu.PC);
+}
+static void test_bvc_branches(void) {
+  TEST_IGNORE();
+  cpu.PC = 0x1000; set_flag(&cpu, FLAG_OVERFLOW, 0);
+  cpu.mem[0x1000] = BVC_REL; cpu.mem[0x1001] = 0x06; bvc(&cpu); cpu.PC += 2;
+  TEST_ASSERT_EQUAL_HEX16(0x1008, cpu.PC);
+}
+static void test_bvc_no_branch(void) {
+  TEST_IGNORE();
+  cpu.PC = 0x1000; set_flag(&cpu, FLAG_OVERFLOW, 1);
+  cpu.mem[0x1000] = BVC_REL; cpu.mem[0x1001] = 0x06; bvc(&cpu); cpu.PC += 2;
+  TEST_ASSERT_EQUAL_HEX16(0x1002, cpu.PC);
+}
+static void test_bvs_branches(void) {
+  TEST_IGNORE();
+  cpu.PC = 0x1000; set_flag(&cpu, FLAG_OVERFLOW, 1);
+  cpu.mem[0x1000] = BVS_REL; cpu.mem[0x1001] = 0x04; bvs(&cpu); cpu.PC += 2;
+  TEST_ASSERT_EQUAL_HEX16(0x1006, cpu.PC);
+}
+static void test_bvs_no_branch(void) {
+  TEST_IGNORE();
+  cpu.PC = 0x1000; set_flag(&cpu, FLAG_OVERFLOW, 0);
+  cpu.mem[0x1000] = BVS_REL; cpu.mem[0x1001] = 0x04; bvs(&cpu); cpu.PC += 2;
+  TEST_ASSERT_EQUAL_HEX16(0x1002, cpu.PC);
+}
+static void test_beq_backward_branch(void) {
+  TEST_IGNORE();
+  cpu.PC = 0x1010; set_flag(&cpu, FLAG_ZERO, 1);
+  cpu.mem[0x1010] = BEQ_REL; cpu.mem[0x1011] = 0xF0; beq(&cpu); cpu.PC += 2;
+  TEST_ASSERT_EQUAL_HEX16(0x1002, cpu.PC);
+}
+
+// --- Modularized Stack Tests ---
+static void test_pha_push_basic(void) {
+  TEST_IGNORE();
+  cpu.A = 0x42; cpu.S = 0xFF; pha(&cpu);
+  TEST_ASSERT_EQUAL_HEX8(0xFE, cpu.S);
+  TEST_ASSERT_EQUAL_HEX8(0x42, cpu.mem[0x01FF]);
+}
+static void test_pha_multiple(void) {
+  TEST_IGNORE();
+  cpu.A = 0x42; cpu.S = 0xFF; pha(&cpu);
+  cpu.A = 0x33; pha(&cpu);
+  TEST_ASSERT_EQUAL_HEX8(0xFD, cpu.S);
+  TEST_ASSERT_EQUAL_HEX8(0x33, cpu.mem[0x01FE]);
+}
+static void test_pla_basic(void) {
+  TEST_IGNORE();
+  cpu.A = 0x42; cpu.S = 0xFF; pha(&cpu);
+  cpu.A = 0x33; pha(&cpu);
+  cpu.A = 0x00; pla(&cpu);
+  TEST_ASSERT_EQUAL_HEX8(0x33, cpu.A);
+  TEST_ASSERT_EQUAL_HEX8(0xFE, cpu.S);
+}
+static void test_pla_zero_sets_flag(void) {
+  TEST_IGNORE();
+  cpu.A = 0x00; cpu.S = 0xFE; cpu.mem[0x01FF] = 0x00; pla(&cpu);
+  TEST_ASSERT_EQUAL_HEX8(0x00, cpu.A);
+  TEST_ASSERT_TRUE(get_flag(&cpu, FLAG_ZERO));
+  TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_NEGATIVE));
+}
+static void test_pla_negative_sets_flag(void) {
+  TEST_IGNORE();
+  cpu.A = 0x00; cpu.S = 0xFE; cpu.mem[0x01FF] = 0x80; pla(&cpu);
+  TEST_ASSERT_EQUAL_HEX8(0x80, cpu.A);
+  TEST_ASSERT_FALSE(get_flag(&cpu, FLAG_ZERO));
+  TEST_ASSERT_TRUE(get_flag(&cpu, FLAG_NEGATIVE));
+}
+static void test_php_push_sets_break_bit(void) {
+  TEST_IGNORE();
+  cpu.S = 0xFF; cpu.P = 0b11010011; php(&cpu);
+  TEST_ASSERT_EQUAL_HEX8(0xFE, cpu.S);
+  TEST_ASSERT_EQUAL_HEX8(0b11110011, cpu.mem[0x01FF]);
+}
+static void test_plp_pull_status_masks_break_and_sets_bit5(void) {
+  TEST_IGNORE();
+  cpu.P = 0x00; cpu.S = 0xFE; cpu.mem[0x01FF] = 0b10100101; plp(&cpu);
+  TEST_ASSERT_EQUAL_HEX8(0xFF, cpu.S);
+  TEST_ASSERT_EQUAL_HEX8(0b10100101 & ~FLAG_BREAK, cpu.P & ~FLAG_BREAK);
+  TEST_ASSERT_EQUAL_HEX8(0b00100000, cpu.P & 0b00100000);
+}
+static void test_stack_wraparound_push_pull(void) {
+  TEST_IGNORE();
+  cpu.S = 0x00; cpu.A = 0x99; pha(&cpu);
+  TEST_ASSERT_EQUAL_HEX8(0xFF, cpu.S);
+  TEST_ASSERT_EQUAL_HEX8(0x99, cpu.mem[0x0100]);
+  cpu.A = 0x00; cpu.S = 0xFF; pla(&cpu);
+  TEST_ASSERT_EQUAL_HEX8(0x00, cpu.S);
+  TEST_ASSERT_EQUAL_HEX8(0x99, cpu.A);
+}
+static void test_pha_does_not_affect_flags(void) {
+  TEST_IGNORE();
+  u8 original_flags = cpu.P; cpu.A = 0x00; pha(&cpu);
+  TEST_ASSERT_EQUAL_HEX8(original_flags, cpu.P);
+  cpu.A = 0x80; pha(&cpu);
+  TEST_ASSERT_EQUAL_HEX8(original_flags, cpu.P);
+}
+
 static void test_and_instructions(void) { TEST_IGNORE(); }
 
 static void test_ora_instructions(void) { TEST_IGNORE(); }
@@ -769,15 +984,102 @@ static void test_sbc_instructions(void) { TEST_IGNORE(); }
 
 int main(void) {
   UNITY_BEGIN();
-  RUN_TEST(test_lda_instructions);
-  RUN_TEST(test_ldx_instructions);
-  RUN_TEST(test_ldy_instructions);
-  RUN_TEST(test_sta_instructions);
-  RUN_TEST(test_stx_instructions);
-  RUN_TEST(test_sty_instructions);
-  RUN_TEST(test_transfer_instructions);
-  RUN_TEST(test_branch_instructions);
-  RUN_TEST(test_stack_instructions);
+  // -- LDA --
+  RUN_TEST(test_lda_immediate);
+  RUN_TEST(test_lda_zeropage);
+  RUN_TEST(test_lda_zeropage_x);
+  RUN_TEST(test_lda_absolute);
+  RUN_TEST(test_lda_absolute_x);
+  RUN_TEST(test_lda_absolute_y);
+  RUN_TEST(test_lda_indirect_x);
+  RUN_TEST(test_lda_indirect_y);
+  RUN_TEST(test_lda_zero_flag);
+  RUN_TEST(test_lda_negative_flag);
+
+  // -- LDX --
+  RUN_TEST(test_ldx_immediate);
+  RUN_TEST(test_ldx_zeropage);
+  RUN_TEST(test_ldx_zeropage_y);
+  RUN_TEST(test_ldx_absolute);
+  RUN_TEST(test_ldx_absolute_y);
+  RUN_TEST(test_ldx_zero_flag);
+  RUN_TEST(test_ldx_negative_flag);
+
+  // -- LDY --
+  RUN_TEST(test_ldy_immediate);
+  RUN_TEST(test_ldy_zeropage);
+  RUN_TEST(test_ldy_zeropage_x);
+  RUN_TEST(test_ldy_absolute);
+  RUN_TEST(test_ldy_absolute_x);
+  RUN_TEST(test_ldy_zero_flag);
+  RUN_TEST(test_ldy_negative_flag);
+
+  // -- STA/STX/STY --
+  RUN_TEST(test_sta_zeropage);
+  RUN_TEST(test_sta_zeropage_x);
+  RUN_TEST(test_sta_absolute);
+  RUN_TEST(test_sta_absolute_x);
+  RUN_TEST(test_sta_absolute_y);
+  RUN_TEST(test_sta_indirect_x);
+  RUN_TEST(test_sta_indirect_y);
+  RUN_TEST(test_sta_flags_unchanged_zero);
+  RUN_TEST(test_sta_flags_unchanged_negative);
+
+  RUN_TEST(test_stx_zeropage);
+  RUN_TEST(test_stx_zeropage_y);
+  RUN_TEST(test_stx_absolute);
+  RUN_TEST(test_stx_flags_unchanged_zero);
+  RUN_TEST(test_stx_flags_unchanged_negative);
+
+  RUN_TEST(test_sty_zeropage);
+  RUN_TEST(test_sty_zeropage_x);
+  RUN_TEST(test_sty_absolute);
+  RUN_TEST(test_sty_flags_unchanged_zero);
+  RUN_TEST(test_sty_flags_unchanged_negative);
+
+  // -- Transfers --
+  RUN_TEST(test_tax_basic);
+  RUN_TEST(test_tax_zero_flag);
+  RUN_TEST(test_tax_negative_flag);
+  RUN_TEST(test_tay_basic);
+  RUN_TEST(test_tay_zero_flag);
+  RUN_TEST(test_tay_negative_flag);
+  RUN_TEST(test_txa_basic);
+  RUN_TEST(test_txa_zero_flag);
+  RUN_TEST(test_txa_negative_flag);
+  RUN_TEST(test_tya_basic);
+  RUN_TEST(test_tya_zero_flag);
+  RUN_TEST(test_tya_negative_flag);
+
+  // -- Branches --
+  RUN_TEST(test_bcc_branches);
+  RUN_TEST(test_bcc_no_branch);
+  RUN_TEST(test_bcs_branches);
+  RUN_TEST(test_bcs_no_branch);
+  RUN_TEST(test_beq_branches);
+  RUN_TEST(test_beq_no_branch);
+  RUN_TEST(test_bmi_branches);
+  RUN_TEST(test_bmi_no_branch);
+  RUN_TEST(test_bne_branches);
+  RUN_TEST(test_bne_no_branch);
+  RUN_TEST(test_bpl_branches);
+  RUN_TEST(test_bpl_no_branch);
+  RUN_TEST(test_bvc_branches);
+  RUN_TEST(test_bvc_no_branch);
+  RUN_TEST(test_bvs_branches);
+  RUN_TEST(test_bvs_no_branch);
+  RUN_TEST(test_beq_backward_branch);
+
+  // -- Stack --
+  RUN_TEST(test_pha_push_basic);
+  RUN_TEST(test_pha_multiple);
+  RUN_TEST(test_pla_basic);
+  RUN_TEST(test_pla_zero_sets_flag);
+  RUN_TEST(test_pla_negative_sets_flag);
+  RUN_TEST(test_php_push_sets_break_bit);
+  RUN_TEST(test_plp_pull_status_masks_break_and_sets_bit5);
+  RUN_TEST(test_stack_wraparound_push_pull);
+  RUN_TEST(test_pha_does_not_affect_flags);
   RUN_TEST(test_and_instructions);
   RUN_TEST(test_ora_instructions);
   RUN_TEST(test_eor_instructions);

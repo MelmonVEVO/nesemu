@@ -284,6 +284,8 @@ typedef enum : u8 {
   FLAG_CARRY = 0x01
 } Flag;
 
+// The memory handling is temporary until I get the CPU opcodes to a functional
+// state.
 typedef struct {
   u8 A;   // Accumulator
   u8 X;   // Index register X
